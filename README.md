@@ -1,6 +1,6 @@
 # moodle-scraper
 
-A TypeScript library for scraping and interacting with the Moodle platform. This project was extracted from the PNJ project to provide an easy way to access course data and Moodle session management.
+A TypeScript library for scraping and interacting with the Moodle platform. This project provides an easy way to access course data and Moodle session management.
 
 ### Keep Session Alive (Awake Feature)
 
