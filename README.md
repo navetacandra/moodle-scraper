@@ -45,6 +45,17 @@ async function main() {
       console.log(`Nama Kursus: ${course.name}`);
       console.log(`Kategori: ${course.category}`);
     });
+
+    // Mengambil daftar acara/tugas mendatang
+    const events = await client.events.upcoming();
+    console.log(`Ditemukan ${events.length} acara mendatang.`);
+
+    events.forEach((event) => {
+      console.log(`Acara: ${event.title}`);
+      console.log(`Waktu: ${new Date(event.time * 1000).toLocaleString()}`);
+      console.log(`Kursus: ${event.course_name}`);
+      console.log('---');
+    });
   } catch (error) {
     console.error('Terjadi kesalahan:', error);
   }

@@ -59,3 +59,13 @@ export interface MoodleAuth {
   cookie: string;
   sesskey: string | null;
 }
+
+export interface MoodleEvent {
+  id: string;
+  title: string;
+  time: number;
+  description: string | null;
+  course_id: number;
+  course_name: string;
+  assign_id: string;
+}

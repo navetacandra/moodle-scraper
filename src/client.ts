@@ -1,15 +1,18 @@
 import { Requester } from "./utils/requester";
 import { CourseManager } from "./courses";
+import { EventManager } from "./events";
 import { MoodleAuth } from "./types";
 
 export class MoodleClient {
   private requester: Requester;
   public courses: CourseManager;
+  public events: EventManager;
   private sesskey: string | null = null;
 
   constructor(private baseUrl: string) {
     this.requester = new Requester();
     this.courses = new CourseManager(this.baseUrl, this.requester);
+    this.events = new EventManager(this.baseUrl, this.requester);
   }
 
   async login(username: string, password: string, opt?: { signal?: AbortSignal }): Promise<MoodleAuth> {
