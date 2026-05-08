@@ -1,21 +1,48 @@
 import { Requester } from "./utils/requester";
 import { CourseManager } from "./courses";
 import { EventManager } from "./events";
-import { MoodleAuth } from "./types";
+import { MoodleAuth, MoodleClientOptions } from "./types";
 
 export class MoodleClient {
   private requester: Requester;
   public courses: CourseManager;
   public events: EventManager;
   private sesskey: string | null = null;
+  private awakeTimer: ReturnType<typeof setInterval> | null = null;
 
-  constructor(private baseUrl: string) {
+  constructor(
+    private baseUrl: string,
+    private options: MoodleClientOptions = {},
+  ) {
     this.requester = new Requester();
     this.courses = new CourseManager(this.baseUrl, this.requester);
     this.events = new EventManager(this.baseUrl, this.requester);
   }
 
-  async login(username: string, password: string, opt?: { signal?: AbortSignal }): Promise<MoodleAuth> {
+  private startAwake() {
+    if (this.awakeTimer) return;
+    const interval = this.options.awakeInterval || 1000 * 60 * 5; // Default 5 minutes
+    this.awakeTimer = setInterval(async () => {
+      try {
+        await this.verifyToken();
+      } catch (e) {
+        // Silently fail if session heartbeat fails
+      }
+    }, interval);
+  }
+
+  private stopAwake() {
+    if (this.awakeTimer) {
+      clearInterval(this.awakeTimer);
+      this.awakeTimer = null;
+    }
+  }
+
+  async login(
+    username: string,
+    password: string,
+    opt?: { signal?: AbortSignal },
+  ): Promise<MoodleAuth> {
     const form = new URLSearchParams();
     form.append("username", username);
     form.append("password", password);
@@ -32,7 +59,9 @@ export class MoodleClient {
 
     if (cookie) this.requester.setCookie(cookie);
 
-    const logintokenMatch = body.match(/input type="hidden" name="logintoken" value="([^"]+)"/);
+    const logintokenMatch = body.match(
+      /input type="hidden" name="logintoken" value="([^"]+)"/,
+    );
     if (!logintokenMatch) {
       throw new Error("Moodle login token not found");
     }
@@ -61,6 +90,10 @@ export class MoodleClient {
     this.sesskey = await this.getSesskey(opt);
     this.courses.setSesskey(this.sesskey);
 
+    if (this.options.awake) {
+      this.startAwake();
+    }
+
     return { cookie, sesskey: this.sesskey };
   }
 
@@ -70,7 +103,9 @@ export class MoodleClient {
       signal: opt?.signal,
     });
     const body = await res.text();
-    return /class="dropdown-item" href="https:\/\/[^\/]+\/user\/profile\.php" title="View profile"/.test(body);
+    return /class="dropdown-item" href="https:\/\/[^\/]+\/user\/profile\.php" title="View profile"/.test(
+      body,
+    );
   }
 
   async getSesskey(opt?: { signal?: AbortSignal }): Promise<string | null> {
@@ -88,6 +123,10 @@ export class MoodleClient {
     this.requester.setCookie(cookie);
     this.sesskey = sesskey;
     this.courses.setSesskey(sesskey);
+
+    if (this.options.awake) {
+      this.startAwake();
+    }
   }
 
   getAuth(): MoodleAuth {
@@ -95,5 +134,12 @@ export class MoodleClient {
       cookie: this.requester.getCookie(),
       sesskey: this.sesskey,
     };
+  }
+
+  logout() {
+    this.stopAwake();
+    this.requester.setCookie("");
+    this.sesskey = null;
+    this.courses.setSesskey(null);
   }
 }

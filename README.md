@@ -2,6 +2,23 @@
 
 A TypeScript library for scraping and interacting with the Moodle platform. This project was extracted from the PNJ project to provide an easy way to access course data and Moodle session management.
 
+### Keep Session Alive (Awake Feature)
+
+You can use the `awake` option to ensure your Moodle session doesn't expire. This will periodically send a request to Moodle to keep the heartbeat active.
+
+```typescript
+const client = new MoodleClient('https://moodle.example.com', {
+  awake: true,
+  awakeInterval: 1000 * 60 * 5 // Optional: check every 5 minutes (default)
+});
+
+// The heartbeat starts after a successful login() or setAuth()
+await client.login('username', 'password');
+
+// To stop the heartbeat, call logout()
+client.logout();
+```
+
 ## Features
 
 - **Easy Authentication**: Supports login with username and password, along with automatic session cookie management.

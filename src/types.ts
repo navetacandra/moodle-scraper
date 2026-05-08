@@ -60,6 +60,11 @@ export interface MoodleAuth {
   sesskey: string | null;
 }
 
+export interface MoodleClientOptions {
+  awake?: boolean;
+  awakeInterval?: number; // in milliseconds
+}
+
 export interface MoodleEvent {
   id: string;
   title: string;
