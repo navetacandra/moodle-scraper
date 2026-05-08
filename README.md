@@ -1,31 +1,31 @@
 # moodle-scraper
 
-Pustaka TypeScript untuk melakukan scraping dan interaksi dengan platform Moodle. Proyek ini diekstraksi dari proyek PNJ untuk menyediakan cara yang mudah dalam mengakses data kursus dan manajemen sesi Moodle.
+A TypeScript library for scraping and interacting with the Moodle platform. This project was extracted from the PNJ project to provide an easy way to access course data and Moodle session management.
 
-## Keunggulan
+## Features
 
-- Otentikasi Mudah: Mendukung login dengan username dan password serta manajemen session cookie secara otomatis.
-- Manajemen Kursus: Memungkinkan pengambilan daftar kursus yang diikuti (enrolled courses) dengan detail lengkap.
-- Pencarian Kursus: Dilengkapi dengan fungsi pencarian kursus di seluruh platform.
-- Berbasis TypeScript: Memberikan dukungan tipe data yang kuat untuk pengembangan yang lebih aman dan terstruktur.
+- **Easy Authentication**: Supports login with username and password, along with automatic session cookie management.
+- **Course Management**: Allows fetching a list of enrolled courses with complete details.
+- **Course Search**: Includes functionality to search for courses across the platform.
+- **TypeScript-based**: Provides strong typing support for safer and more structured development.
 
-## Instalasi
+## Installation
 
-Pastikan Anda telah menginstal Node.js dan npm di sistem Anda.
+Ensure you have Node.js and npm installed on your system.
 
 ```bash
 npm install
 ```
 
-Untuk membangun proyek dari sumber:
+To build the project from source:
 
 ```bash
 npm run build
 ```
 
-## Penggunaan
+## Usage
 
-Berikut adalah contoh dasar cara menggunakan `MoodleClient` untuk melakukan login dan mengambil daftar kursus:
+Below is a basic example of how to use `MoodleClient` to log in and fetch a list of courses:
 
 ```typescript
 import { MoodleClient } from './src';
@@ -34,30 +34,30 @@ async function main() {
   const client = new MoodleClient('https://moodle.example.com');
 
   try {
-    // Login ke platform Moodle
+    // Log in to the Moodle platform
     const auth = await client.login('your_username', 'your_password');
-    console.log('Login berhasil');
+    console.log('Login successful');
 
-    // Mengambil daftar kursus yang diikuti
+    // Fetch enrolled courses
     const courses = await client.courses.list();
     
     courses.forEach((course) => {
-      console.log(`Nama Kursus: ${course.name}`);
-      console.log(`Kategori: ${course.category}`);
+      console.log(`Course Name: ${course.name}`);
+      console.log(`Category: ${course.category}`);
     });
 
-    // Mengambil daftar acara/tugas mendatang
+    // Fetch upcoming events/assignments
     const events = await client.events.upcoming();
-    console.log(`Ditemukan ${events.length} acara mendatang.`);
+    console.log(`Found ${events.length} upcoming events.`);
 
     events.forEach((event) => {
-      console.log(`Acara: ${event.title}`);
-      console.log(`Waktu: ${new Date(event.time * 1000).toLocaleString()}`);
-      console.log(`Kursus: ${event.course_name}`);
+      console.log(`Event: ${event.title}`);
+      console.log(`Time: ${new Date(event.time * 1000).toLocaleString()}`);
+      console.log(`Course: ${event.course_name}`);
       console.log('---');
     });
   } catch (error) {
-    console.error('Terjadi kesalahan:', error);
+    console.error('An error occurred:', error);
   }
 }
 
